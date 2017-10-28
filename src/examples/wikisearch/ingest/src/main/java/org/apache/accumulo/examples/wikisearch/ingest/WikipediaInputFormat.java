@@ -75,14 +75,10 @@ public class WikipediaInputFormat extends TextInputFormat {
       Path file = new Path(in.readUTF());
       long start = in.readLong();
       long length = in.readLong();
-      String [] hosts = null;
-      if(in.readBoolean())
-      {
-        int numHosts = in.readInt();
-        hosts = new String[numHosts];
-        for(int i = 0; i < numHosts; i++)
-          hosts[i] = in.readUTF();
-      }
+      int numHosts = in.readInt();
+      String[] hosts = new String[numHosts];
+      for(int i = 0; i < numHosts; i++)
+        hosts[i] = in.readUTF();
       fileSplit = new FileSplit(file, start, length, hosts);
       partition = in.readInt();
     }
@@ -93,17 +89,10 @@ public class WikipediaInputFormat extends TextInputFormat {
       out.writeLong(fileSplit.getStart());
       out.writeLong(fileSplit.getLength());
       String [] hosts = fileSplit.getLocations();
-      if(hosts == null)
-      {
-        out.writeBoolean(false);
-      }
-      else
-      {
-        out.writeBoolean(true);
-        out.writeInt(hosts.length);
-        for(String host:hosts)
+      out.writeInt(hosts.length);
+      for(String host:hosts)
         out.writeUTF(host);
-      }
+      fileSplit.write(out);
       out.writeInt(partition);
     }
     

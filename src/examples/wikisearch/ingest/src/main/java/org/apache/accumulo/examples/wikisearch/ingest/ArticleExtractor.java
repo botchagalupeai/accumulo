@@ -16,9 +16,6 @@
  */
 package org.apache.accumulo.examples.wikisearch.ingest;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 import java.io.Reader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -32,7 +29,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.accumulo.examples.wikisearch.normalizer.LcNoDiacriticsNormalizer;
 import org.apache.accumulo.examples.wikisearch.normalizer.NumberNormalizer;
-import org.apache.hadoop.io.Writable;
 
 
 public class ArticleExtractor {
@@ -41,14 +37,12 @@ public class ArticleExtractor {
   private static NumberNormalizer nn = new NumberNormalizer();
   private static LcNoDiacriticsNormalizer lcdn = new LcNoDiacriticsNormalizer();
   
-  public static class Article implements Writable {
+  public static class Article {
     int id;
     String title;
     long timestamp;
     String comments;
     String text;
-    
-    public Article(){}
     
     private Article(int id, String title, long timestamp, String comments, String text) {
       super();
@@ -95,24 +89,6 @@ public class ArticleExtractor {
       fields.put("TIMESTAMP", nn.normalizeFieldValue("TIMESTAMP", this.timestamp));
       fields.put("COMMENTS", lcdn.normalizeFieldValue("COMMENTS", this.comments));
       return fields;
-    }
-
-    @Override
-    public void readFields(DataInput in) throws IOException {
-      id = in.readInt();
-      title = in.readUTF();
-      timestamp = in.readLong();
-      comments = in.readUTF();
-      text = in.readUTF();
-    }
-
-    @Override
-    public void write(DataOutput out) throws IOException {
-      out.writeInt(id);
-      out.writeUTF(title);
-      out.writeLong(timestamp);
-      out.writeUTF(comments);
-      out.writeUTF(text);
     }
     
   }
